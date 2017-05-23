@@ -11,6 +11,7 @@ import fakeData from '../../utils/fake_data.json';
 import useTableOptions from './configs/use_table_options.js';
 import tableColumns from './configs/columns.js';
 import sortableColumns from './configs/sortable_columns.js';
+import rowsGrouping from './configs/rows_grouping.js';
 
 // vue
 import Vue from 'vue';
@@ -18,32 +19,25 @@ import { ClientTable, Event } from 'vue-tables-2';
 import VueCookie from 'vue-cookie';
 
 // templates
-import * as cellTemplates from './templates/cell_templates.jsx';
-import tableTemplate from './templates/table_template.js';
+import * as cellTemplates from '../templates/cell_templates.jsx';
+import tableTemplate from '../templates/table_template.js';
 
 // vue-components
 import favoriteButton from '../components/FavoriteButton.vue';
 import symbolCell from '../components/SymbolCell.vue';
 
-//  TODO: implement dynamic grouping
-let groupBy = {
-  ascending: true,
-  prop: 'category_name',
-  rowTriggerClass: 'table-row table-row__group-trigger'
-};
-
 // needed for group sorting
 let groupSorter = function (cellName) {
   return function (ascending) {
     return function (a, b) {
-      let groupA = a[groupBy.prop];
-      let groupB = b[groupBy.prop];
+      let groupA = a[rowsGrouping.prop];
+      let groupB = b[rowsGrouping.prop];
 
       let cellA = typeof a[cellName] == 'string' ? a[cellName].toLowerCase() : a[cellName];
       let cellB = typeof b[cellName] == 'string' ? b[cellName].toLowerCase() : b[cellName];
 
       // sort by group name
-      if (groupBy.ascending) {
+      if (rowsGrouping.ascending) {
         if (groupA > groupB) return 1;
         if (groupA < groupB) return -1;
       } else {
@@ -117,7 +111,7 @@ export default {
           symbol: 'symbolCell',
           is_favorite: 'favoriteCell'
         },
-        groupBy: groupBy,
+        rowsGrouping: rowsGrouping,
         sortable: sortableColumns,
         orderBy: {
           ascending: true,
