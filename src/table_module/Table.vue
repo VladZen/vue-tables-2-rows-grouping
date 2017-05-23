@@ -12,6 +12,7 @@ import useTableOptions from './configs/use_table_options.js';
 import tableColumns from './configs/columns.js';
 import sortableColumns from './configs/sortable_columns.js';
 import rowsGrouping from './configs/rows_grouping.js';
+import customSorting from './configs/sorting.js';
 
 // vue
 import Vue from 'vue';
@@ -25,49 +26,6 @@ import tableTemplate from '../templates/table_template.js';
 // vue-components
 import favoriteButton from '../components/FavoriteButton.vue';
 import symbolCell from '../components/SymbolCell.vue';
-
-// needed for group sorting
-let groupSorter = function (cellName) {
-  return function (ascending) {
-    return function (a, b) {
-      let groupA = a[rowsGrouping.prop];
-      let groupB = b[rowsGrouping.prop];
-
-      let cellA = typeof a[cellName] == 'string' ? a[cellName].toLowerCase() : a[cellName];
-      let cellB = typeof b[cellName] == 'string' ? b[cellName].toLowerCase() : b[cellName];
-
-      // sort by group name
-      if (rowsGrouping.ascending) {
-        if (groupA > groupB) return 1;
-        if (groupA < groupB) return -1;
-      } else {
-        if (groupA < groupB) return 1;
-        if (groupA > groupB) return -1;
-      }
-
-      // sort by cell name
-      if (ascending) {
-        if (cellA >= cellB) return 1;
-        if (cellA < cellB) return -1;
-      } else {
-        if (cellA <= cellB) return 1;
-        if (cellA > cellB) return -1;
-      }
-    }
-  }
-};
-
-// implementing custom sorting function to all columns
-let customSorting = (function () {
-  let columns = tableColumns;
-  let obj = {};
-
-  for (var i = 0; i < columns.length; i++) {
-    obj[columns[i]] = groupSorter(columns[i]);
-  }
-
-  return obj;
-})();
 
 // implementing
 Vue.component('favoriteCell', favoriteButton);
@@ -104,6 +62,7 @@ export default {
     return {
       columns: tableColumns,
       tableData: fakeData,
+      // needed for triggers of rows
       shownGroups: [],
       options: {
         templates: {
@@ -120,7 +79,8 @@ export default {
         rowClassCallback(row) {
           return `table-row table-row__${row.status}`;
         },
-        customSorting: customSorting
+        // contains modified according to rows-grouping sorting function
+        customSorting: customSorting(sortableColumns, rowsGrouping)
       }
     }
   }
