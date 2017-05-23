@@ -1,0 +1,14 @@
+bootstrapVersion: 3
+
+useCustomIconFontPath: false
+
+useFlexbox: false
+
+styleLoaders:
+  - style-loader
+  - css-loader
+  - sass-loader
+
+styles: true
+
+scripts: false
