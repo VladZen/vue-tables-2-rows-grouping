@@ -15,7 +15,7 @@ const jsonfile = require('jsonfile');
 ***/
 
 const config = {
-  path: './src/table_module/fake_data.json',
+  path: './fake_data.json',
   amount: 30,
   images: ['cat', 'dog', 'fox', 'koala', 'lion', 'owl', 'penguin', 'pig', 'raccoon', 'sheep'],
   categories: ['Quizes', 'Tests', 'Cloaked'],
