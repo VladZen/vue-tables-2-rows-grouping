@@ -20,7 +20,7 @@ module.exports = function (h, that) {
 
       // if group is not created yet, create it
       if (!result[current.category_name]) {
-        let toggleIconClass = currentGroupIsCollapsed ? 'glyphicon glyphicon-chevron-down' : 'glyphicon glyphicon-chevron-up';
+        let toggleIconClass = currentGroupIsCollapsed ?  `${that.opts.sortIcon.base} ${that.opts.sortIcon.down}` : `${that.opts.sortIcon.base} ${that.opts.sortIcon.up}`;
 
         result[current.category_name] = [];
         // creating trigger row

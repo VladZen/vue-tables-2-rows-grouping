@@ -111,7 +111,7 @@ export default {
           symbol: 'symbolCell',
           is_favorite: 'favoriteCell'
         },
-        rowsGrouping: rowsGrouping,
+        groupBy: rowsGrouping,
         sortable: sortableColumns,
         orderBy: {
           ascending: true,
