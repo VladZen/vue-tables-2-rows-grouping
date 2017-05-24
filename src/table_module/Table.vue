@@ -1,5 +1,8 @@
 <template>
-  <v-client-table :data="tableData" :columns="columns" :options="options"></v-client-table>
+  <div>
+    <v-client-table :data="tableData" :columns="columns" :options="options"></v-client-table>
+    <table-context-menu :buttons="tableButtons" />
+  </div>
 </template>
 
 <script>
@@ -13,6 +16,7 @@ import tableColumns from './configs/columns.js';
 import sortableColumns from './configs/sortable_columns.js';
 import rowsGrouping from './configs/rows_grouping.js';
 import customSorting from './configs/sorting.js';
+import tableButtons from './configs/context-menu-buttons.js';
 
 // vue
 import Vue from 'vue';
@@ -26,19 +30,27 @@ import tableTemplate from '../templates/table_template.js';
 // vue-components
 import favoriteButton from '../components/FavoriteButton.vue';
 import symbolCell from '../components/SymbolCell.vue';
+import tableContextMenu from '../components/TableContextMenu.vue';
 
 // implementing
-Vue.component('favoriteCell', favoriteButton);
-Vue.component('symbolCell', symbolCell);
+Vue.component('favorite-cell', favoriteButton);
+Vue.component('symbol-cell', symbolCell);
+Vue.component('table-context-menu', tableContextMenu);
 Vue.use(ClientTable, useTableOptions, false, tableTemplate('client'));
 Vue.use(VueCookie);
 
 export default {
   created() {
     // favorite button
-    Event.$on('table-row:favorite-clicked', (data) => {
-      let index = _findIndex(this.$data.tableData, (i) => i.id == data.id);
-      this.$data.tableData.splice(index, 1, data);
+    Event.$on('table-row:favorite-clicked', (row) => {
+      let index = _findIndex(this.$data.tableData, (i) => i.id == row.id);
+      this.$data.tableData.splice(index, 1, row);
+    });
+
+    // table context buttons clicks
+    Event.$on('table-context-menu:delete-clicked', (row) => {
+      let index = _findIndex(this.$data.tableData, (i) => i.id == row.id);
+      this.$data.tableData.splice(index, 1);
     });
 
     // pull shown groups from cookies
@@ -60,6 +72,7 @@ export default {
   },
   data() {
     return {
+      tableButtons,
       columns: tableColumns,
       tableData: fakeData,
       // needed for triggers of rows
@@ -67,8 +80,8 @@ export default {
       options: {
         templates: {
           ...cellTemplates,
-          symbol: 'symbolCell',
-          is_favorite: 'favoriteCell'
+          symbol: 'symbol-cell',
+          is_favorite: 'favorite-cell'
         },
         groupBy: rowsGrouping,
         sortable: sortableColumns,
