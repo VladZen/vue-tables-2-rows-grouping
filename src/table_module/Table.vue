@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class='table-wrapper'>
     <v-client-table :data="tableData" :columns="columns" :options="options"></v-client-table>
     <table-context-menu :buttons="tableButtons" />
   </div>
@@ -101,6 +101,10 @@ export default {
 </script>
 
 <style lang='scss'>
+.table-wrapper {
+    position: relative;
+}
+
 .table-row {
   &__active {
     td {
