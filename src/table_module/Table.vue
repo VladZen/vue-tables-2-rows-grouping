@@ -51,6 +51,8 @@ export default {
     Event.$on('table-context-menu:delete-clicked', (row) => {
       let index = _findIndex(this.$data.tableData, (i) => i.id == row.id);
       this.$data.tableData.splice(index, 1);
+      // this will close context menu
+      Event.$emit('table-context-menu:reset');
     });
 
     // pull shown groups from cookies

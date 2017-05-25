@@ -1,5 +1,6 @@
 <template>
-  <div v-show="isShown"
+  <div id="table-context-menu"
+        v-show="isShown"
         class="table-context-menu"
         :style='{ top: `${coordinates.top}px`, left: `${coordinates.left}px` }'>
     <span v-for="button in buttons" :key="button.name" class="table-context-menu_button-wrap">
@@ -26,6 +27,9 @@
 </template>
 
 <script>
+// utils
+import closest from '../helpers/closest-fn.js';
+
 // vue
 import { Event } from 'vue-tables-2';
 
@@ -45,8 +49,7 @@ let countCoordinates = function (mouseEvent) {
   if (mouseEvent.pageX || mouseEvent.pageY) {
     x = mouseEvent.pageX;
     y = mouseEvent.pageY;
-  }
-  else {
+  } else {
     x = mouseEvent.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
     y = mouseEvent.clientY + document.body.scrollTop + document.documentElement.scrollTop;
   }
@@ -59,32 +62,40 @@ let countCoordinates = function (mouseEvent) {
   };
 };
 
-let resetDataAttacher = (function () {
-  // TODO: prevent multiple attaching of the listener due to stopPropagation in method
-  // trigger
-  let isAttached = false;
+let closeContextMenu = function () {
+  let defaults = defaultData();
+  this.$data.isShown = defaults.isShown;
+  this.$data.row = defaults.row;
+};
 
-  return function () {
-    if (!isAttached) {
-      isAttached = true
-      let clickHandler = (e) => {
-        e.target.removeEventListener(e.type, clickHandler);
-        let defaults = defaultData();
-        console.log('one time clicked', e);
-        this.$data.isShown = defaults.isShown;
-        this.$data.row = defaults.row;
-        isAttached = false
-    	};
-
-    	document.documentElement.addEventListener('click', clickHandler);
+let resetDataAttacher = function () {
+  let obj = {};
+  obj.trigger = false;
+  obj.fn = () => {
+    if (!obj.trigger) {
+      obj.trigger = true;
+      document.documentElement.addEventListener('click', (e) => {
+        // check if click target is context menu or placed inside context menu
+        let menuIsClicked = closest(e.target, '#table-context-menu') || e.target.id == 'table-context-menu';
+        // do nothing if click target is placed in context menu
+        if (!menuIsClicked) {
+          e.target.removeEventListener(e.type, obj.fn);
+          closeContextMenu.call(this);
+          obj.trigger = false;
+        }
+      });
     }
   }
-})();
+
+  return obj;
+};
 
 export default {
   props: ['buttons'],
-  created() {
-    // watch for row click
+  created () {
+    let attacher = resetDataAttacher.call(this);
+
+    // listen for row click
     Event.$on('vue-tables.row-click', (data) => {
       data.event.stopPropagation();
       let e   = data.event;
@@ -93,7 +104,14 @@ export default {
       this.$data.isShown = true;
       this.$data.row = row;
       this.$data.coordinates = countCoordinates(e);
-      resetDataAttacher.call(this);
+      attacher.fn();
+    });
+
+    // listen for context menu destroy event
+    Event.$on('table-context-menu:reset', () => {
+      attacher.trigger = false;
+      document.documentElement.removeEventListener('click', attacher.fn);
+      closeContextMenu.call(this);
     });
   },
   data: defaultData

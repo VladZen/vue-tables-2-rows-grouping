@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "jquery": "^3.2.1",
+    "lodash.clonedeep": "^4.5.0",
     "lodash.findindex": "^4.6.0",
     "lodash.values": "^4.3.0",
     "vue": "^2.2.1",
