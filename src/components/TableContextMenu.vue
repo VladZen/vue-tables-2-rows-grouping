@@ -112,7 +112,12 @@ let resetDataAttacher = function () {
 };
 
 export default {
-  props: ['buttons'],
+  props: {
+    buttons: {
+      type: Array,
+      required: true
+    }
+  },
   created () {
     // initializing attacher obj
     let attacher = resetDataAttacher.call(this);
