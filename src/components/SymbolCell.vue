@@ -18,7 +18,7 @@ export default {
   methods: {
     get_avatar_image(name) {
       let images = require.context('../assets/images/', false, /\.svg$/);
-      return images('./' + name + '.svg');
+      return images(`./${name}.svg`);
     }
   }
 }

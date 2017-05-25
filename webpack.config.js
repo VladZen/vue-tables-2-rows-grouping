@@ -37,8 +37,8 @@ module.exports = {
         }
       },
       {
-        test: /\.(woff2?|svg)$/,
-        loader: 'url-loader?limit=10000'
+        test: /\.(woff|woff2|svg)$/,
+        loader: 'url-loader?limit=15000'
       },
       {
         test: /\.(ttf|eot)$/,
