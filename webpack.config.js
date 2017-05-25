@@ -5,7 +5,7 @@ module.exports = {
   entry: [ 'bootstrap-loader', './src/main.js' ],
   output: {
     path: path.resolve(__dirname, './dist'),
-    publicPath: '/dist/',
+    publicPath: 'dist/',
     filename: 'build.js'
   },
   module: {
@@ -37,12 +37,8 @@ module.exports = {
         }
       },
       {
-        test: /\.(woff|woff2|svg)$/,
+        test: /\.woff($|\?)|\.woff2($|\?)|\.ttf($|\?)|\.eot($|\?)|\.svg($|\?)/,
         loader: 'url-loader?limit=15000'
-      },
-      {
-        test: /\.(ttf|eot)$/,
-        loader: 'file-loader'
       }
     ]
   },
