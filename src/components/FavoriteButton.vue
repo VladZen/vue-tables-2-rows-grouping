@@ -1,7 +1,9 @@
 <template>
-  <button class='btn btn-default btn-sm' type='button' @click='toggle'>
+  <button class='btn btn-default btn-sm'
+          type='button'
+          @click.stop='toggle'>
     <i class='glyphicon'
-      v-bind:class="iconClass">
+      :class="iconClass">
     </i>
   </button>
 </template>

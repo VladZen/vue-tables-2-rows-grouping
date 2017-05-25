@@ -1,8 +1,10 @@
+<!-- NOTICE: table context is absolute element. For proper displaying make sure
+that parent node is relative positioning -->
 <template>
   <div id="table-context-menu"
-        v-show="isShown"
         class="table-context-menu"
-        :style='{ top: `${coordinates.top}px`, left: `${coordinates.left}px` }'>
+        :class="[shown, {'table-context-menu__invert': isInvert}]"
+        :style="{ top: `${coordinates.top}px`, left: `${coordinates.left}px` }">
     <span v-for="button in buttons" :key="button.name" class="table-context-menu_button-wrap">
       <button v-if="button.type == 'button'"
               class="table-context-menu_button"
@@ -37,6 +39,7 @@ let defaultData = function () {
   return {
     row: {},
     isShown: false,
+    isInvert: false,
     coordinates: {
       top: 0,
       left: 0
@@ -53,9 +56,27 @@ let countCoordinates = function (mouseEvent) {
     x = mouseEvent.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
     y = mouseEvent.clientY + document.body.scrollTop + document.documentElement.scrollTop;
   }
-  // TODO: uncomment it. gCanvasElement == table-wrapper
-  // x -= gCanvasElement.offsetLeft;
-  // y -= gCanvasElement.offsetTop;
+
+  let el = this.$el;
+  let parent = this.$parent.$el;
+  let elWidth = el.offsetWidth;
+  let parentBounds = parent.getBoundingClientRect();
+
+  // the block bellow is called to watch for the right border
+  // this supposed to prevent initializing
+  // of the context menu out of wrapper borders
+
+  // count the distance between x coordinate of click
+  // and right wrapper border
+  let rightBoundDistance = parentBounds.right - x;
+
+  if (rightBoundDistance < elWidth) {
+    x -= elWidth;
+    this.$data.isInvert = true;
+  } else {
+    this.$data.isInvert = false;
+  }
+
   return {
     top: y,
     left: x
@@ -93,6 +114,7 @@ let resetDataAttacher = function () {
 export default {
   props: ['buttons'],
   created () {
+    // initializing attacher obj
     let attacher = resetDataAttacher.call(this);
 
     // listen for row click
@@ -103,7 +125,7 @@ export default {
       // show context menu
       this.$data.isShown = true;
       this.$data.row = row;
-      this.$data.coordinates = countCoordinates(e);
+      this.$data.coordinates = countCoordinates.call(this, e);
       attacher.fn();
     });
 
@@ -114,7 +136,12 @@ export default {
       closeContextMenu.call(this);
     });
   },
-  data: defaultData
+  data: defaultData,
+  computed: {
+    shown () {
+      return this.isShown ? 'table-context-menu__shown' : 'table-context-menu__hidden';
+    }
+  }
 }
 </script>
 
@@ -126,8 +153,25 @@ export default {
   position: absolute;
   background-color: #fff;
 
+  &__shown {
+    opacity: 1;
+  }
+
+  &__hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &__invert {
+    // clear: both;
+
+    .table-context-menu_button-wrap {
+      float: right;
+    }
+  }
+
   &_button-wrap {
-    padding: 5px;
+    padding: 0 5px;
   }
 
   &_button, &_link {

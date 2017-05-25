@@ -104,7 +104,7 @@ export default {
 
 <style lang='scss'>
 .table-wrapper {
-    position: relative;
+  position: relative;
 }
 
 .table-row {
