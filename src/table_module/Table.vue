@@ -28,14 +28,11 @@ import * as cellTemplates from '../templates/cell_templates.jsx';
 import tableTemplate from '../templates/table_template.js';
 
 // vue-components
-import favoriteButton from '../components/FavoriteButton.vue';
-import symbolCell from '../components/SymbolCell.vue';
-import tableContextMenu from '../components/TableContextMenu.vue';
+import FavoriteButton from '../components/FavoriteButton.vue';
+import SymbolCell from '../components/SymbolCell.vue';
+import TableContextMenu from '../components/TableContextMenu.vue';
 
 // implementing
-Vue.component('favorite-cell', favoriteButton);
-Vue.component('symbol-cell', symbolCell);
-Vue.component('table-context-menu', tableContextMenu);
 Vue.use(ClientTable, useTableOptions, false, tableTemplate('client'));
 Vue.use(VueCookie);
 
@@ -72,6 +69,11 @@ export default {
       this.$cookie.set('openedGroups', this.shownGroups);
     }
   },
+  components: {
+    FavoriteButton,
+    SymbolCell,
+    TableContextMenu
+  },
   data() {
     return {
       tableButtons,
@@ -82,8 +84,8 @@ export default {
       options: {
         templates: {
           ...cellTemplates,
-          symbol: 'symbol-cell',
-          is_favorite: 'favorite-cell'
+          symbol: SymbolCell,
+          is_favorite: FavoriteButton
         },
         groupBy: rowsGrouping,
         sortable: sortableColumns,
