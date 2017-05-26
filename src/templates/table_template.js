@@ -3,7 +3,6 @@ module.exports = function(source) {
     var rows = require('./rows')(h, this);
     var normalFilter = require('./normal-filter')(h, this);
     var dropdownPagination = require('./dropdown-pagination')(h, this);
-    // var columnFilters = require('./column-filters')(h, this);
     var noResults = require('./no-results')(h, this);
     var pagination = require('./pagination')(h, this);
     var dropdownPaginationCount = require('./dropdown-pagination-count')(h, this);
@@ -26,8 +25,8 @@ module.exports = function(source) {
           <tr>
             {headings}
           </tr>
-          {/* {columnFilters} */}
         </thead>
+    
         <tbody>
           {noResults}
           {rows}
