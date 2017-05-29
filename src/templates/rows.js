@@ -1,13 +1,31 @@
-var _values = require('lodash.values');
+let _values = require('lodash.values');
 
 module.exports = function (h, that) {
-  var rows = [];
-  var columns;
-  var rowKey = that.opts.uniqueKey;
+  let rows = [];
+  let columns;
+  let rowKey = that.opts.uniqueKey;
 
-  var rowClass;
-  var data = that.source == 'client' ? that.filteredData : that.tableData;
-  var shownGroups = that.$parent.shownGroups;
+  let rowClass;
+  let data = that.source == 'client' ? that.filteredData : that.tableData;
+  let shownGroups = that.$parent.shownGroups;
+
+  // highlighting max values
+  if (that.opts.maxValuesColumns) {
+    maxValues = data
+    .reduce(function (result, current) {
+      that.opts.maxValuesColumns.map(function (column) {
+        // column max value is already defined
+        if ((typeof result[column] == 'undefined') || (current[column] > result[column].value)) {
+          result[column] = {
+            row_id: current.id,
+            value: current[column]
+          };
+        }
+      });
+
+      return result;
+    }.bind(that), {});
+  }
 
   // grouping implementation
   if (that.opts.groupBy) {
@@ -15,12 +33,14 @@ module.exports = function (h, that) {
     let groups = data
     .reduce(function (result, current) {
       columns = [];
+
       // search group name in cookies
       let currentGroupIsCollapsed = shownGroups.indexOf(current.category_name) == -1;
 
       // if group is not created yet, create it
       if (!result[current.category_name]) {
-        let toggleIconClass = currentGroupIsCollapsed ?  `${that.opts.sortIcon.base} ${that.opts.sortIcon.down}` : `${that.opts.sortIcon.base} ${that.opts.sortIcon.up}`;
+        let toggleIconClass = currentGroupIsCollapsed ?  that.opts.sortIcon.down : that.opts.sortIcon.up;
+        toggleIconClass += ` ${that.opts.sortIcon.base}`;
 
         result[current.category_name] = [];
         // creating trigger row
@@ -43,8 +63,16 @@ module.exports = function (h, that) {
       if (currentGroupIsCollapsed) return result;
 
       that.allColumns.map(function (column) {
+        let cellStyle = that.columnClass(column);
+
+        // watching if value is max
+        if (that.opts.maxValuesColumns && that.opts.cellMaxValueClass) {
+          let isMaxCounted = that.opts.maxValuesColumns.indexOf(column) > -1;
+          if (isMaxCounted && current.id == maxValues[column].row_id) cellStyle += that.opts.cellMaxValueClass;
+        }
+
         columns.push(
-          <td class={ that.columnClass(column) }>
+          <td class={ cellStyle }>
             { that.render(current, column, h) }
           </td>
         )
@@ -67,7 +95,6 @@ module.exports = function (h, that) {
     data.map(function (row, index) {
       columns = [];
 
-      // в массив columns вставляется ячейка для разворачивания дочерней строки
       if (that.opts.childRow) columns.push(
         <td on-click={ that.toggleChildRow.bind(that,row[rowKey]) }
             class={ `VueTables__child-row-toggler ` + that.childRowTogglerClass(row[rowKey]) }>
@@ -75,10 +102,20 @@ module.exports = function (h, that) {
         </td>
       );
 
+      mapColumns.call(that, columns, )
+
       that.allColumns.map(function (column) {
+        let cellStyle = that.columnClass(column);
+
+        // watching if value is max
+        if (that.opts.maxValuesColumns && that.opts.cellMaxValueClass) {
+          let isMaxCounted = that.opts.maxValuesColumns.indexOf(column) > -1;
+          if (isMaxCounted && current.id == maxValues[column].row_id) cellStyle += that.opts.cellMaxValueClass;
+        }
+
         columns.push(
-          <td class={ that.columnClass(column) }>
-            { that.render(row, column, h) }
+          <td class={ cellStyle }>
+            { that.render(current, column, h) }
           </td>
         )
       }.bind(that));
@@ -91,8 +128,8 @@ module.exports = function (h, that) {
       );
 
       if (that.opts.childRow && this.rowsToggleState['row_' + row[rowKey]]) {
-        var childRow = that.opts.childRow;
-        var template = typeof childRow === 'function' ? childRow.apply(that, [h, row]) : h(childRow, {
+        let childRow = that.opts.childRow;
+        let template = typeof childRow === 'function' ? childRow.apply(that, [h, row]) : h(childRow, {
           attrs: {
             data: row
           }

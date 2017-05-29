@@ -16,7 +16,8 @@ import tableColumns from './configs/columns.js';
 import sortableColumns from './configs/sortable_columns.js';
 import rowsGrouping from './configs/rows_grouping.js';
 import customSorting from './configs/sorting.js';
-import tableButtons from './configs/context-menu-buttons.js';
+import tableButtons from './configs/context_menu_buttons.js';
+import maxValuesColumns from './configs/max_values_columns.js';
 
 // vue
 import Vue from 'vue';
@@ -53,7 +54,7 @@ export default {
     });
 
     // pull shown groups from cookies
-    this.$data.shownGroups = this.$cookie.get('openedGroups').split(',') || [];
+    this.$data.shownGroups = this.$cookie.get('openedGroups') && this.$cookie.get('openedGroups').split(',') || [];
   },
   methods: {
     toggleGroup (groupName) {
@@ -87,6 +88,8 @@ export default {
           symbol: SymbolCell,
           is_favorite: FavoriteButton
         },
+        maxValuesColumns,
+        cellMaxValueClass: 'table-row_max-value',
         groupBy: rowsGrouping,
         sortable: sortableColumns,
         orderBy: {
@@ -110,6 +113,10 @@ export default {
 }
 
 .table-row {
+  td {
+    font-weight: 300;
+  }
+
   &__active {
     td {
       opacity: 1;
@@ -118,8 +125,12 @@ export default {
 
   &__archived {
     td {
-      opacity: .3;
+      opacity: .5;
     }
+  }
+
+  &_max-value {
+    font-weight: bold !important;
   }
 }
 </style>
