@@ -2,6 +2,9 @@
 
 > This is an example how the [ng-table](https://github.com/esvit/ng-table)-like rows grouping can be implemented in [vue-tables-2](https://github.com/matfish2/vue-tables-2) data grid plugin
 
+# Live demo
+[Click](https://vladzen.github.io/vue-tables-2-rows-grouping/)
+
 ## Build Setup
 
 ``` bash
